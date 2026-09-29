@@ -1,0 +1,19 @@
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.task h3 {
+  margin: 0 0 8px;
+}
+
+.task p {
+  margin: 0;
+}
