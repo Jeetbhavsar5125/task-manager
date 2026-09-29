@@ -2,8 +2,28 @@
 
 <p>Total tasks: {{ tasks.length }}</p>
 
+<!-- Feedback message after PATCH or DELETE -->
+<p class="message" *ngIf="message">{{ message }}</p>
+
 @for (task of tasks; track task.id) {
-  <p>
-    {{ task.id }} - {{ task.title }}
-  </p>
+  <div class="task-item" [class.done]="task.completed">
+
+    <span class="task-title">
+      {{ task.id }} — {{ task.title }}
+    </span>
+
+    <div class="task-actions">
+
+      <!-- PATCH button -->
+      <button class="btn-patch" (click)="toggleComplete(task)">
+        {{ task.completed ? '↩️ Undo' : '✅ Complete' }}
+      </button>
+
+      <!-- DELETE button -->
+      <button class="btn-delete" (click)="deleteTask(task.id)">
+        🗑️ Delete
+      </button>
+
+    </div>
+  </div>
 }
