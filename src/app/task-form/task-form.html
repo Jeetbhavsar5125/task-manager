@@ -1,0 +1,64 @@
+<div class="form-container">
+  <h2>Task Form — POST & PUT Demo</h2>
+
+  <!-- Form fields -->
+  <div class="form-group">
+    <label for="taskTitle">Task Title</label>
+    <input
+      id="taskTitle"
+      type="text"
+      [(ngModel)]="title"
+      placeholder="Enter task title..."
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="taskId">Task ID (for PUT only)</label>
+    <input
+      id="taskId"
+      type="number"
+      [(ngModel)]="taskId"
+      placeholder="e.g. 5"
+    />
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label>
+      <input type="checkbox" [(ngModel)]="completed" />
+      Mark as Completed
+    </label>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="btn-group">
+    <button class="btn-post" (click)="onPost()" [disabled]="isLoading">
+      🟢 POST (Create New Task)
+    </button>
+
+    <button class="btn-put" (click)="onPut()" [disabled]="isLoading">
+      🔵 PUT (Replace Task by ID)
+    </button>
+  </div>
+
+  <!-- Loading indicator -->
+  @if (isLoading) {
+    <p class="loading">⏳ Sending request...</p>
+  }
+
+  <!-- Success message -->
+  @if (message) {
+    <p class="response-message">{{ message }}</p>
+  }
+
+  <!-- Show the raw API response -->
+  @if (responseData) {
+    <div class="response-box">
+      <h3>📦 API Response:</h3>
+      <p><strong>ID:</strong> {{ responseData.id }}</p>
+      <p><strong>User ID:</strong> {{ responseData.userId }}</p>
+      <p><strong>Title:</strong> {{ responseData.title }}</p>
+      <p><strong>Completed:</strong> {{ responseData.completed }}</p>
+    </div>
+  }
+
+</div>

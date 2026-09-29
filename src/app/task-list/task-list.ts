@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
 
@@ -9,8 +9,43 @@ import { Task } from '../models/task.model';
   styleUrl: './task-list.css',
 })
 export class TaskList implements OnInit {
+
   tasks: Task[] = [];
   message: string = '';
+
+  // 👇 NEW: emits a task upward when user clicks Edit
+  @Output() editRequested = new EventEmitter<Task>();
+
+  // Add this property at the top of the class (with tasks and message)
+private localIdCounter = -1;   // starts at -1, decrements: -1, -2, -3...
+
+// Updated newTask setter
+@Input() set newTask(task: Task | null) {
+  if (task) {
+    const localTask: Task = {
+      ...task,
+      id: this.localIdCounter--   // assigns -1 first, then -2, then -3...
+    };
+    this.tasks.unshift(localTask);
+    this.message = `✅ New task added! (Local ID: ${localTask.id})`;
+    this.cdr.detectChanges();
+  }
+}
+
+
+  // For PUT — find and replace existing task
+  @Input() set updatedTask(task: Task | null) {
+    if (task) {
+      const exists = this.tasks.some(t => t.id === task.id);
+      if (exists) {
+        this.tasks = this.tasks.map(t => t.id === task.id ? task : t);
+        this.message = `PUT 🔵 Task #${task.id} updated!`;
+      } else {
+        this.message = `PUT ⚠️ Task #${task.id} not in current view`;
+      }
+      this.cdr.detectChanges();
+    }
+  }
 
   constructor(
     private taskService: TaskService,
@@ -18,24 +53,29 @@ export class TaskList implements OnInit {
   ) {}
 
   async ngOnInit() {
-    console.log('TaskList initialized');
     this.tasks = await this.taskService.getTasks();
-    this.cdr.detectChanges(); // Tell Angular to re-check the view after axios resolves
+    this.cdr.detectChanges();
   }
-  async toggleComplete(task : Task ){
-    const updated = await this.taskService.patchTask(task.id,{
-      completed : !task.completed
+
+  async toggleComplete(task: Task) {
+    const updated = await this.taskService.patchTask(task.id, {
+      completed: !task.completed
     });
     task.completed = updated.completed;
-    this.message = `Patch task #${task.id} marked as ${updated.completed ? 'completed': 'incomplete '}`;
+    this.message = `PATCH ✅ Task #${task.id} marked as ${updated.completed ? 'completed' : 'incomplete'}`;
     this.cdr.detectChanges();
   }
-  // DELETE - remove task from the list
-  async deleteTask(id: number){
+
+  async deleteTask(id: number) {
     await this.taskService.deleteTask(id);
-    // remove from the local array
-    this.tasks = this.tasks.filter(t=>t.id !== id);
-    this.message = `Delete task #${id}`;
+    this.tasks = this.tasks.filter(t => t.id !== id);
+    this.message = `DELETE 🗑️ Task #${id} removed`;
     this.cdr.detectChanges();
   }
+
+  // 👇 NEW: called when Edit button is clicked
+  requestEdit(task: Task) {
+    this.editRequested.emit(task);  // send the task UP to app.ts
+  }
+
 }

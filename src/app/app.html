@@ -1,1 +1,13 @@
-<app-task-list/>
+<app-task-form
+  (taskCreated)="onTaskCreated($event)"
+  (taskUpdated)="onTaskUpdated($event)"
+  [taskToEdit]="taskToEdit"
+/>
+
+<hr />
+
+<app-task-list
+  [newTask]="latestTask"
+  [updatedTask]="updatedTask"
+  (editRequested)="onEditRequested($event)"
+/>
